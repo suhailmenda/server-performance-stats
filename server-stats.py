@@ -36,7 +36,7 @@ def get_cpu_usage_windows():
     return None
 
 def get_cpu_usage_linux():
-    result = subprocess.run=(["top", "-b", "-n1"])
+    result = subprocess.run(["top", "-b", "-n1"], capture_output=True,text=True)
     output = result.stdout.splitlines()
     cpu_line = None
     for line in output:
@@ -44,9 +44,11 @@ def get_cpu_usage_linux():
             cpu_line = line
             break
     if cpu_line:
-        cpu_usage_info = cpu_line.strip(" ")
-        print(cpu_usage_info)
-    return 0
+        pattern = r"(\d+.\d+)"
+        percent = re.findall(pattern,cpu_line)
+        cpu_usage_info = 100 - float(percent[3])
+        return cpu_usage_info
+    return None
 
 def get_cpu_usage():
     if platform.system() == 'Linux':  # macOS is Darwin
