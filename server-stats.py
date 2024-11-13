@@ -4,10 +4,8 @@ import time
 import re
 
 def get_cpu_usage_mac():
-    # Run the 'top' command in batch mode and capture the output
-    result = subprocess.run(['top', '-l1'], capture_output=True, text=True)
+    result = subprocess.run(['top', '-l1'])
     
-    # Check for the CPU usage line (usually starts with "Cpu(s)")
     output = result.stdout.splitlines()
     cpu_line = None
     for line in output:
@@ -16,15 +14,12 @@ def get_cpu_usage_mac():
             break
     
     if cpu_line:
-        # Example line on Linux: "Cpu(s):  1.5% us,  0.5% sy,  0.0% ni, 97.8% id, ..."
-        # We want the percentage of 'us' (user space) and 'sy' (system space)
         pattern = r"(\d+\.\d+)%"
         cpu_usage_info = re.findall(pattern,cpu_line)
         user_space = float(cpu_usage_info[0])
         system_space = float(cpu_usage_info[1])
         idle_space = float(cpu_usage_info[2])
 
-        # Total CPU usage = user + system (ignoring idle)
         total_usage = user_space + system_space
         return total_usage
     return None
@@ -41,6 +36,16 @@ def get_cpu_usage_windows():
     return None
 
 def get_cpu_usage_linux():
+    result = subprocess.run=(["top", "-b", "-n1"])
+    output = result.stdout.splitlines()
+    cpu_line = None
+    for line in output:
+        if "%Cpu(s)" in line:
+            cpu_line = line
+            break
+    if cpu_line:
+        cpu_usage_info = cpu_line.strip(" ")
+        print(cpu_usage_info)
     return 0
 
 def get_cpu_usage():
