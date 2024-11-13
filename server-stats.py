@@ -25,13 +25,10 @@ def get_cpu_usage_mac():
     return None
 
 def get_cpu_usage_windows():
-    # Run the 'wmic cpu' command to get the CPU usage on Windows
     result = subprocess.run(['wmic', 'cpu', 'get', 'loadpercentage'], capture_output=True, text=True)
     
-    # Parse the output to extract the CPU usage percentage
     output = result.stdout.splitlines()
     if len(output) > 1:
-        # The second line should contain the load percentage
         return float(output[1].strip())
     return None
 
