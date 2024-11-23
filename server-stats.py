@@ -31,19 +31,17 @@ def get_usage_mac():
         return total_usage,mem[1] 
     return None
 
-def get_cpu_usage_windows():
-    result = subprocess.run(['wmic', 'cpu', 'get', 'loadpercentage'], capture_output=True, text=True)
-    
-    output = result.stdout.splitlines()
-    if len(output) > 1:
-        return float(output[1].strip())
-    return None
 
 def get_usage_linux():
     result = subprocess.run(["top", "-b", "-n1"], capture_output=True,text=True)
     output = result.stdout.splitlines()
     cpu_line = None
     MemUsage = None
+    freeMem = None
+    usageMem = None
+    percentMem = None
+    cpu_usage_info = None
+
     for line in output:
         if "%Cpu(s)" in line:
             cpu_line = line
@@ -59,7 +57,8 @@ def get_usage_linux():
         mem = re.findall(r'\d+\.\d+|\d+', MemUsage)
         freeMem, usageMem = float(mem[1]), float(mem[2])
         percentMem = (usageMem / freeMem) * 100
-        return cpu_usage_info, freeMem , usageMem , percentMem
+        df_output = subprocess.run(["df"],["-h"], capture_output=True, text=True)
+        return cpu_usage_info, freeMem , usageMem , percentMem, df_output
     return None
 
 
@@ -75,6 +74,8 @@ def get_usage():
         return None
 
 
-cpu_usage, freeMem, usageMem, percentMem = get_usage()
+cpu_usage, freeMem, usageMem, percentMem, diskUsage = get_usage()
 
 print(f"Cpu Usage is {cpu_usage}%, free memory is {freeMem}MB, memory used is {usageMem}MB and percentage of memory used is {percentMem}%")
+print("This is the disk usage")
+print(f"{diskUsage}")
