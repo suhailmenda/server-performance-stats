@@ -57,7 +57,7 @@ def get_usage_linux():
         percent = re.findall(pattern,cpu_line)
         cpu_usage_info = 100 - float(percent[3])
         mem = re.findall(r'\d+\.\d+|\d+', MemUsage)
-        freeMem, usageMem = mem[1], mem[2]
+        freeMem, usageMem = float(mem[1]), float(mem[2])
         percentMem = (usageMem / freeMem) * 100
         return cpu_usage_info, freeMem , usageMem , percentMem
     return None
@@ -77,4 +77,4 @@ def get_usage():
 
 cpu_usage, freeMem, usageMem, percentMem = get_usage()
 
-print(f"Cpu Usage is {cpu_usage}%,free memory is {freeMem}, memory used is {usageMem} and percentage of memory usaed is {percentMem}")
+print(f"Cpu Usage is {cpu_usage}%, free memory is {freeMem}MB, memory used is {usageMem}MB and percentage of memory used is {percentMem}%")
