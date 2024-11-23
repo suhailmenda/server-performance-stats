@@ -57,7 +57,7 @@ def get_usage_linux():
         mem = re.findall(r'\d+\.\d+|\d+', MemUsage)
         freeMem, usageMem = float(mem[1]), float(mem[2])
         percentMem = (usageMem / freeMem) * 100
-        df_output = subprocess.run(["df"],["-h"], capture_output=True, text=True)
+        df_output = subprocess.run(["df","-h"], capture_output=True, text=True)
         diskUsage = df_output.stdout
         return cpu_usage_info, freeMem , usageMem , percentMem, diskUsage
     return None
