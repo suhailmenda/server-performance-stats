@@ -3,17 +3,23 @@ import platform
 import time
 import re
 
-def get_cpu_usage_mac():
-    result = subprocess.run(['top', '-l1'])
-    
+def get_usage_mac():
+    result = subprocess.run(['top', '-l1'], capture_output=True, text=True)
     output = result.stdout.splitlines()
     cpu_line = None
+    MemUsage = None
     for line in output:
         if "CPU" in line:
             cpu_line = line
-            break
+
+        if "PhysMem" in line:
+            MemUsage = line
     
-    if cpu_line:
+        if cpu_line and MemUsage:
+            break 
+    
+    
+    if cpu_line and MemUsage:
         pattern = r"(\d+\.\d+)%"
         cpu_usage_info = re.findall(pattern,cpu_line)
         user_space = float(cpu_usage_info[0])
@@ -21,7 +27,8 @@ def get_cpu_usage_mac():
         idle_space = float(cpu_usage_info[2])
 
         total_usage = user_space + system_space
-        return total_usage
+        mem = MemUsage.split(" ")
+        return total_usage,mem[1] 
     return None
 
 def get_cpu_usage_windows():
@@ -32,31 +39,40 @@ def get_cpu_usage_windows():
         return float(output[1].strip())
     return None
 
-def get_cpu_usage_linux():
+def get_usage_linux():
     result = subprocess.run(["top", "-b", "-n1"], capture_output=True,text=True)
     output = result.stdout.splitlines()
     cpu_line = None
+    MemUsage = None
     for line in output:
         if "%Cpu(s)" in line:
             cpu_line = line
+        if "MiB Mem" in line:
+            MemUsage = line
+        if cpu_line and MemUsage:
             break
-    if cpu_line:
+
+    if cpu_line and MemUsage:
         pattern = r"(\d+.\d+)"
         percent = re.findall(pattern,cpu_line)
         cpu_usage_info = 100 - float(percent[3])
-        return cpu_usage_info
+        mem = re.findall(r'\d+\.\d+|\d+', MemUsage)
+        return cpu_usage_info, mem[2]
     return None
 
-def get_cpu_usage():
+
+
+def get_usage():
     if platform.system() == 'Linux':  # macOS is Darwin
-        return get_cpu_usage_linux()
+        return get_usage_linux()
     elif  platform.system() == 'Darwin':
-        return get_cpu_usage_mac()
+        return get_usage_mac()
     elif platform.system() == 'Windows':
         return get_cpu_usage_windows()
     else:
         return None
 
-# Get the total CPU usage and print it
-cpu_usage = get_cpu_usage()
-print(f"Total CPU Usage: {cpu_usage}%")
+
+cpu_usage,mem_usage = get_usage()
+
+print(f"Cpu Usage is {cpu_usage}% and Mem usage is ${mem_usage}")
