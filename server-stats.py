@@ -25,10 +25,14 @@ def get_usage_mac():
         user_space = float(cpu_usage_info[0])
         system_space = float(cpu_usage_info[1])
         idle_space = float(cpu_usage_info[2])
-
         total_usage = user_space + system_space
-        mem = MemUsage.split(" ")
-        return total_usage,mem[1] 
+        mem = re.findall(r"\d+", MemUsage) 
+        freeMem = float(mem[3]) * 1024
+        usageMem = float(mem[0]) * 1024
+        percentMem = (freeMem / usageMem ) * 100
+        df_output = subprocess.run(["df","-h"], capture_output=True, text=True)
+        diskUsage = df_output.stdout
+        return total_usage, freeMem , usageMem , percentMem, diskUsage
     return None
 
 

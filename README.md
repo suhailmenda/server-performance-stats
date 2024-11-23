@@ -1,5 +1,5 @@
 # Server Stats
-Bash Script to dump server performance stats
+Python Script to dump server performance stats
 
-Work in Progress!
+It automatically detects the platform on which the system is running and provides the instantaneous usage information about the machine
 
